@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -15,13 +16,17 @@ import java.util.TreeMap;
 @RestController
 public class SkillController {
 
-    Map<String, Integer> responseCounts = new HashMap<>();
+    final AssignmentService assignmentService;
+    final Map<String, Integer> responseCounts = new HashMap<>();
 
-    @Autowired AssignmentService assignmentService;
+    @Autowired
+    public SkillController(AssignmentService assignmentService) {
+        this.assignmentService = assignmentService;
+    }
 
     @RequestMapping("/next.json")
-    public Map getNextAssignment(@RequestParam String username) {
-        Map assignmentContent = new TreeMap();
+    public Map<String, Serializable> getNextAssignment(@RequestParam String username) {
+        Map<String, Serializable> assignmentContent = new TreeMap<>();
 
         if (responseCounts.getOrDefault(username, 0) >= 3) {
             assignmentContent.put("available", false);

@@ -12,6 +12,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <!-- These properties will be set by the Maven Dependency plugin -->
+        <annotatedJdk>${org.checkerframework:jdk8:jar}</annotatedJdk>
+        <!-- Uncomment to use the type annotations compiler. -->
+        <!-- <typeAnnotationsJavac>${org.checkerframework:compiler:jar}</typeAnnotationsJavac> -->
     </properties>
     
     <parent>
@@ -27,6 +31,23 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+        <!-- annotations from the Checker Framework: nullness, interning, locking, ... -->
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+            <version>2.1.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker</artifactId>
+            <version>2.1.11</version>
+        </dependency>
+        <!-- The annotated JDK to use -->
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>jdk8</artifactId>
+            <version>2.1.11</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -86,22 +107,23 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.6.1</version>
                 <configuration>
-                    <compilerId>javac-with-errorprone</compilerId>
-                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <fork>true</fork>
+                    <annotationProcessors>
+                        <!-- Add all the checkers you want to enable here -->
+                        <annotationProcessor>org.checkerframework.checker.nullness.NullnessChecker</annotationProcessor>
+                    </annotationProcessors>
+                    <compilerArgs>
+                        <!-- location of the annotated JDK, which comes from a Maven dependency -->
+                        <arg>-Xbootclasspath/p:${annotatedJdk}</arg>
+                        <!-- Uncomment the following line to use the type annotations compiler. -->
+                        <!-- <arg>-J-Xbootclasspath/p:${typeAnnotationsJavac}</arg> -->
+                    </compilerArgs>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                        <version>2.5</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -112,6 +134,18 @@
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- This plugin will set properties values using dependency information -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
                         </goals>
                     </execution>
                 </executions>

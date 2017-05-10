@@ -3,16 +3,14 @@ package rage.skills;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AssignmentService {
 
-    private List<String> assignments;
+    private final List<String> assignments;
 
-    @PostConstruct
-    public void init() {
+    public AssignmentService() {
         this.assignments = new ArrayList<>();
         this.assignments.add("/path/to/exercise1.zip");
         this.assignments.add("/path/to/exercise2.zip");
