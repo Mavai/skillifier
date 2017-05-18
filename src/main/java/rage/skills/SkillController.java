@@ -25,17 +25,10 @@ public class SkillController {
     }
 
     @RequestMapping("/next.json")
-    public Map<String, Serializable> getNextAssignment(@RequestParam String username) {
+    public Map<String, Serializable> getNextAssignment() {
         Map<String, Serializable> assignmentContent = new TreeMap<>();
-
-        if (responseCounts.getOrDefault(username, 0) >= 3) {
-            assignmentContent.put("available", false);
-        } else {
             assignmentContent.put("available", true);
-            assignmentContent.put("zip_url", assignmentService.getRandomAssignment(username));
-        }
-
-        responseCounts.put(username, responseCounts.getOrDefault(username, 0) + 1);
+            assignmentContent.put("zip_url", "/zip");
         return assignmentContent;
     }
 
